@@ -1,0 +1,42 @@
+
+server:
+  port: 8080
+
+ribbon:
+  ServerListRefreshInterval: 1000
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+        prefer-ip-address: true
+        serviceName: wfg-${spring.application.name}
+#        healthCheckPath: ${management.context-path}/health
+        health-check-path: /health
+        healthCheckInterval: 15s
+        fail-fast: false
+        register-health-check: true
+        health-check-critical-timeout: 5m
+        tags: foo=WFG
+      config:
+        enabled: ${CONFIG_ENABLED:true}
+        prefix: config
+        defaultContext: ${spring.application.name}
+        data-key: data
+        format: YAML
+
+management:
+  server:
+    port: 10001
+  context-path: /ops
+  security:
+    enabled: false
+
+logging:
+  level:
+    org.springframework.cloud.consul: DEBUG
